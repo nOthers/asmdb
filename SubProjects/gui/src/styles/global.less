@@ -1,0 +1,42 @@
+* {
+  margin: 0px;
+  box-sizing: border-box;
+  font-size: 0px;
+  font-family: Menlo;
+  cursor: default;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+input {
+  outline: none;
+  border: none;
+  background: none;
+  padding: 0px;
+}
+
+a {
+  outline: none;
+  text-decoration: none;
+}
+
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+.user-select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@import '~@/styles/theme';
+
+*::selection {
+  background: @color-background-selection;
+}
