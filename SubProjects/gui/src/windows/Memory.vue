@@ -13,6 +13,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
+const MIN_OFFSET = 4;
 
 class Source {
   constructor(start, end, group, history) {
@@ -253,7 +254,7 @@ export default {
         }
         var posn = {
           index: index,
-          offset: -4
+          offset: -MIN_OFFSET
         };
         if (!this.show) {
           this.show = true;
