@@ -322,6 +322,19 @@ class WsGdbController(GdbController):
         mem = await self.mem(start, end)
         ret = []
         for i in capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB).disasm(mem, start):
+            if i.address % 32 == 0:
+                ret.append({
+                    'type': 'annotation',
+                    'address': i.address,
+                    'size': 0,
+                    'value': '',
+                })
+                ret.append({
+                    'type': 'annotation',
+                    'address': i.address,
+                    'size': 0,
+                    'value': 'annotation32',
+                })
             ret.append({
                 'type': 'instruction',
                 'address': i.address,

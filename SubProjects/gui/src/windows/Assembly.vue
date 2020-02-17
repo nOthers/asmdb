@@ -5,6 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
+          <Annotation v-if="props.item.type=='annotation'" :address="props.item.address" :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Annotation>
           <Byte v-if="props.item.type=='byte'" :address="props.item.address" :value="props.item.value" :highlight="source.toContains(props.item,itemSelection)" :running="source.toContains(props.item,pc)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Byte>
           <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :comment="source.toInstructionComment(props.item,breakpoints)" :highlight="source.toContains(props.item,itemSelection)" :running="source.toContains(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
@@ -16,6 +17,7 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
+import Annotation from '@/views/Annotation';
 import Byte from '@/views/Byte';
 import Instruction from '@/views/Instruction';
 const MIN_OFFSET = 4;
@@ -71,6 +73,7 @@ class Source {
 
   append(index, value) {
     value.height = {
+      annotation: Annotation,
       byte: Byte,
       instruction: Instruction
     }[value.type].measureHeight(value);

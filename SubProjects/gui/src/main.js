@@ -21,6 +21,7 @@ import toast from '@/plugins/toast';
 Vue.use(toast);
 
 import AnimateButton from '@/views/AnimateButton';
+import Annotation from '@/views/Annotation';
 import AssistInput from '@/views/AssistInput';
 import Byte from '@/views/Byte';
 import Bytes from '@/views/Bytes';
@@ -46,6 +47,7 @@ import Registers from '@/windows/Registers';
 import Stack from '@/windows/Stack';
 import Watchpoints from '@/windows/Watchpoints';
 Vue.component('AnimateButton', AnimateButton);
+Vue.component('Annotation', Annotation);
 Vue.component('AssistInput', AssistInput);
 Vue.component('Byte', Byte);
 Vue.component('Bytes', Bytes);
