@@ -1,6 +1,6 @@
 <template>
   <div class="annotation-container">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @mouseup="onMouseUpItem(index, ...arguments)"></span>
   </div>
 </template>
 
@@ -40,6 +40,7 @@ export default {
       var items = [];
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
       items.push(newItem(address));
+      items[items.length - 1].index = -1;
       if (this.value) {
         items.push(newItem('&nbsp;&nbsp;'));
         for (var s of this.value) {
@@ -65,6 +66,30 @@ export default {
         ctx.fillStyle = Theme.colorText3;
         ctx.fillText(this.value, x, y);
       }
+    },
+    onMouseUpItem: function(index, event) {
+      if (event.button == 2) {
+        if (this.items[index] && this.items[index].index != undefined) {
+          var menu = this.onCreateMenu(this.items[index].index);
+          this.$menu.alert(event, menu, i => {
+            menu[i].event();
+          });
+          event.stopPropagation();
+        }
+      }
+    },
+    onCreateMenu: function(index) {
+      var items = [];
+      if (index == -1) {
+        var intValue = this.address;
+        items.push(['Copy', '', true]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$toast.alert('Text Copied');
+          copyText('0x' + intValue.toString(16));
+        };
+      }
+      return items;
     }
   }
 };
