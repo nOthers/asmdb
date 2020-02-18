@@ -2,7 +2,8 @@
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
     <span class="user-select-none" :css-focus="focus" :css-disable="disable" @click="onClick">{{name}}</span>
     <div class="navigation-grow">
-      <span v-for="(item, index) in labels" :key="index">{{item}}</span>
+      <span v-for="(item, index) in labels" :key="'label'+index">{{item}}</span>
+      <div v-for="(item, index) in actions" :key="'action'+index" :style="{backgroundImage:'url(\'/static/icons/'+item+'.png\')'}" @click="onActionClick(item)"></div>
     </div>
     <div v-if="gradient" class="navigation-gradient" :style="{background:'linear-gradient('+backgroundColor+', transparent)'}"></div>
   </div>
@@ -18,6 +19,7 @@ export default {
   props: {
     name: String,
     label: String,
+    action: String,
     focus: Boolean,
     disable: Boolean,
     gradient: Boolean
@@ -25,6 +27,9 @@ export default {
   computed: {
     labels: function() {
       return (this.label || '').split('|').filter(item => item);
+    },
+    actions: function() {
+      return (this.action || '').split('|').filter(item => item);
     }
   },
   mounted: function() {
@@ -39,6 +44,9 @@ export default {
         this.$emit('mouseup2', event);
         event.stopPropagation();
       }
+    },
+    onActionClick: function(item) {
+      this.$emit('actionclick', item);
     }
   }
 };
@@ -77,6 +85,15 @@ export default {
       font-size: 14px;
       font-family: 'Wawati SC';
       color: @color-text;
+    }
+    > div {
+      margin: 11px 12px 0px 0px;
+      width: 16px;
+      height: 16px;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center center;
+      cursor: pointer;
     }
   }
   .navigation-gradient {

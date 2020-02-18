@@ -1,9 +1,12 @@
 <template>
   <div class="assembly-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="0" :condition="searchTest" @search="jumpTo"></Search>
-    <Navigation :name="'Assembly'" :label="label" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
+    <Navigation :name="'Assembly'" :label="first.label" :action="first.action" :focus="focus" :disable="disable" :gradient="first.gradient" @mouseup2="onMouseUp2" @actionclick="onActionClick"></Navigation>
     <div class="assembly-column">
       <div class="assembly-row">
+        <Frame v-if="nest[0].show">
+          <Functions></Functions>
+        </Frame>
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
           <Annotation v-if="props.item.type=='annotation'" :address="props.item.address" :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Annotation>
           <Byte v-if="props.item.type=='byte'" :address="props.item.address" :value="props.item.value" :highlight="source.toContains(props.item,itemSelection)" :running="source.toContains(props.item,pc)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Byte>
@@ -16,6 +19,7 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
+import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import Annotation from '@/views/Annotation';
 import Byte from '@/views/Byte';
@@ -184,7 +188,6 @@ export default {
     return {
       focus: false,
       disable: true,
-      label: null,
       pc: null,
       source: null,
       itemSelection: null,
@@ -192,10 +195,22 @@ export default {
       counter: 0,
       incomplete: 0,
       counter2: 0,
-      hst: []
+      hst: [],
+      nest: [{ show: false, label: 'functions', action: 'close', gradient: true }],
+      label: null,
+      action: null,
+      gradient: true
     };
   },
   computed: {
+    first: function() {
+      for (var i of this.nest) {
+        if (i.show) {
+          return i;
+        }
+      }
+      return this;
+    },
     instructionGroup: function() {
       return 7;
     }
@@ -232,7 +247,16 @@ export default {
       items.push(['Go back', '⌫', this.hst.length > 0]);
       items.push(['Search address', '↩︎', true]);
       items.push(['Return to PC', 'space', this.needReturnTo()]);
+      items.push(['Expand functions', '⌘1', !this.nest[0].show]);
+      items.push(['Collapse all', '⌘0', this.first != this]);
       this.$menu.alert(event, items, this.onClickMenu);
+    },
+    onActionClick: function(action) {
+      switch (action) {
+        case 'close':
+          this.switchNest(-1);
+          break;
+      }
     },
     onClickMenu: function(index) {
       switch (index) {
@@ -247,15 +271,42 @@ export default {
             this.returnTo();
           }
           break;
+        case 3:
+        case 4:
+          this.switchNest(index - 3);
+          break;
       }
     },
     onKeyDown: function(event) {
+      var d = 0;
       var index = [8, 13, 32].indexOf(event.keyCode);
       if (index >= 0) {
-        this.onClickMenu(index);
+        this.onClickMenu(index + d);
         return true;
       } else {
-        return false;
+        d += 3;
+        index = ['1', '0'].indexOf(event.key);
+        if (index >= 0 && !event.altKey && !event.ctrlKey && event.metaKey && !event.shiftKey) {
+          this.onClickMenu(index + d);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    switchNest: function(index) {
+      var changed = false;
+      for (var i = 0; i < this.nest.length; i++) {
+        var show = i == index;
+        if (this.nest[i].show != show) {
+          this.nest[i].show = show;
+          changed = true;
+        }
+      }
+      if (changed) {
+        this.$nextTick(() => {
+          resize.dispatchEvent();
+        });
       }
     },
     hstDel: function() {
@@ -448,9 +499,12 @@ export default {
     .assembly-row {
       width: 0px;
       flex-grow: 1;
+      display: flex;
+      flex-direction: column;
       overflow-x: scroll;
       .assembly-scroller {
-        height: 100%;
+        height: 0px;
+        flex-grow: 1;
       }
     }
   }
