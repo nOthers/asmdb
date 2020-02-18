@@ -20,8 +20,10 @@ export default {
   data: function() {
     return {
       anim: new Animation(function(v, t) {
-        var k = 2 * Math.abs(t - v);
-        k = Math.max(k, 0.2);
+        var y = 1 - Math.abs(v - t);
+        var x = 1 - Math.pow(1 - y, 1 / 2);
+        var k = 2 - 2 * x;
+        k = Math.max(k, 0.01);
         return k / 147;
       })
     };
@@ -50,8 +52,7 @@ export default {
           h = getChildrenHeight(this.$el);
         }
         var height = h * t;
-        var opacity = Math.min(t * 10, 1);
-        return { height: height + 1 + 'px', opacity: opacity };
+        return { height: height + 1 + 'px' };
       }
     }
   }
