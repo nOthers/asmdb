@@ -4,7 +4,7 @@
     <Navigation :name="'Assembly'" :label="first.label" :action="first.action" :focus="focus" :disable="disable" :gradient="first.gradient" @mouseup2="onMouseUp2" @actionclick="onActionClick"></Navigation>
     <div class="assembly-column">
       <div class="assembly-row">
-        <Frame v-if="nest[0].show">
+        <Frame :show="nest[0].show">
           <Functions></Functions>
         </Frame>
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
@@ -19,7 +19,6 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
-import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import Annotation from '@/views/Annotation';
 import Byte from '@/views/Byte';
@@ -295,18 +294,8 @@ export default {
       }
     },
     switchNest: function(index) {
-      var changed = false;
       for (var i = 0; i < this.nest.length; i++) {
-        var show = i == index;
-        if (this.nest[i].show != show) {
-          this.nest[i].show = show;
-          changed = true;
-        }
-      }
-      if (changed) {
-        this.$nextTick(() => {
-          resize.dispatchEvent();
-        });
+        this.nest[i].show = i == index;
       }
     },
     hstDel: function() {

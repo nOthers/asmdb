@@ -1,17 +1,68 @@
 <template>
-  <div class="frame-container">
+  <div class="frame-container" :style="style">
     <slot></slot>
   </div>
 </template>
 
 <script>
-export default {};
+import Animation from '@/scripts/animation';
+import resize from '@/scripts/resize';
+
+function getChildrenHeight(el) {
+  var sum = 0;
+  for (var node of el.childNodes) {
+    sum += node.clientHeight;
+  }
+  return sum;
+}
+
+export default {
+  data: function() {
+    return {
+      anim: new Animation(function(v, t) {
+        var k = 2 * Math.abs(t - v);
+        k = Math.max(k, 0.2);
+        return k / 147;
+      })
+    };
+  },
+  props: {
+    show: Boolean
+  },
+  watch: {
+    show: function(newValue, oldValue) {
+      this.anim.$target(newValue ? 1 : 0);
+    }
+  },
+  computed: {
+    style: function() {
+      this.$nextTick(() => {
+        resize.dispatchEvent();
+      });
+      var t = this.anim.value;
+      if (t == 0) {
+        return { display: 'none' };
+      } else if (t == 1) {
+        return {};
+      } else {
+        var h = 0;
+        if (this.$el) {
+          h = getChildrenHeight(this.$el);
+        }
+        var height = h * t;
+        var opacity = Math.min(t * 10, 1);
+        return { height: height + 1 + 'px', opacity: opacity };
+      }
+    }
+  }
+};
 </script>
 
 <style lang="less">
 @import '~@/styles/theme';
 
 .frame-container {
+  overflow-y: hidden;
   border-bottom: 1px solid @color-border-light;
 }
 </style>
