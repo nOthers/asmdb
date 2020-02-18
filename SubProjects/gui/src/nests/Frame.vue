@@ -23,8 +23,7 @@ export default {
         var y = 1 - Math.abs(v - t);
         var x = 1 - Math.pow(1 - y, 1 / 2);
         var k = 2 - 2 * x;
-        k = Math.max(k, 0.01);
-        return k / 147;
+        return Math.max(k, 0.01) / 147;
       })
     };
   },
