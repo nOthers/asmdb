@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3
 import re
 import json
 import copy

@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3
 import sys
 from .wsclient import WsController, WsError
 
