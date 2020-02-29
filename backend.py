@@ -81,7 +81,7 @@ async def adb_startup(serial, process):
     await adb_shell(serial, f'/data/gdbserver :29714 --attach {pid}', su=True, daemon=True)
     cmd = f'adb -s {serial} forward tcp:29714 tcp:29714'
     await (await asyncio.create_subprocess_shell(cmd, stdout=PIPE)).stdout.read()
-    return '0.0.0.0:29714'
+    return '127.0.0.1:29714'
 
 
 async def gdb_startup(config, println):
