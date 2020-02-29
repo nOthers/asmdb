@@ -9,10 +9,10 @@ from asyncio.subprocess import PIPE, STDOUT, DEVNULL
 
 def list_subprocess(pid):
     sub_pids = []
-    for line in os.popen(f'ps -l|grep {pid}').read().strip().split('\n'):
+    for line in os.popen('ps -o pid,ppid').read().strip().split('\n')[1:]:
         words = line.split()
-        if int(words[2]) == pid:
-            sub_pids.append(int(words[1]))
+        if int(words[1]) == pid:
+            sub_pids.append(int(words[0]))
     return sub_pids
 
 
