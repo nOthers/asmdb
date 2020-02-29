@@ -4,13 +4,13 @@ import asyncio
 from aiohttp import web
 from .backend import Device
 from .wsserver import onopen, onmessage, onclose
-DIST_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'SubProjects', 'gui', 'dist')
+mydir = os.path.dirname(os.path.realpath(__file__))
 app = web.Application()
-app.router.add_static('/static', os.path.join(DIST_DIR, 'static'))
+app.router.add_static('/static', os.path.join(mydir, 'SubProjects', 'gui', 'dist', 'static'))
 
 
 async def index(request):
-    return web.FileResponse(os.path.join(DIST_DIR, 'index.html'))
+    return web.FileResponse(os.path.join(mydir, 'SubProjects', 'gui', 'dist', 'index.html'))
 app.router.add_get('/', index)
 
 
