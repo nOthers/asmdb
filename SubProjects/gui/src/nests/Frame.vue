@@ -23,7 +23,7 @@ export default {
         var y = 1 - Math.abs(v - t);
         var x = 1 - Math.pow(1 - y, 1 / 2);
         var k = 2 - 2 * x;
-        var d = 1;
+        var d = 0;
         if (this.$el) {
           d = getChildrenHeight(this.$el) / screen.height;
         }
