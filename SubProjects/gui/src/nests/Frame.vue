@@ -33,6 +33,9 @@ export default {
   watch: {
     show: function(newValue, oldValue) {
       this.anim.$target(newValue ? 1 : 0);
+      if (newValue) {
+        this.$children[0].onUpdate();
+      }
     }
   },
   computed: {

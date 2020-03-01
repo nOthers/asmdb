@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Frame :show="nest[0].show">
-          <Symbols></Symbols>
+          <Symbols @clickitem="jumpTo"></Symbols>
         </Frame>
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
           <Annotation v-if="props.item.type=='annotation'" :address="props.item.address" :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Annotation>

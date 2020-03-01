@@ -316,6 +316,14 @@ class Debugger {
     this.push('assigned', express);
   }
 
+  nm(target, success) {
+    this.pull('nm', [target], function (ret) {
+      if (success) {
+        success(ret);
+      }
+    });
+  }
+
   setwinsize(rows, cols) {
     this.pull('setwinsize', [rows, cols]);
   }
@@ -461,6 +469,24 @@ class Debugger {
 
   isSuspend() {
     return this.struct.suspend;
+  }
+
+  getLibraries() {
+    var set = [];
+    var libraries = [];
+    for (var info of this.struct.maps) {
+      if (!info.section) {
+        continue;
+      }
+      if (set.indexOf(info.target) < 0) {
+        libraries.push({
+          value: info.start - info.offset,
+          name: info.target
+        });
+        set.push(info.target);
+      }
+    }
+    return libraries;
   }
 
   getAddressInfo(address) {
@@ -675,6 +701,7 @@ function delToken(obj, key) {
 }
 
 export default {
+  getSimpleTarget: getSimpleTarget,
   newInstance: newInstance,
   getInstance: getInstance,
   oldInstance: oldInstance,
