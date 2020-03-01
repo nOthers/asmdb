@@ -50,6 +50,10 @@ def dest_pair(address):
         raise TypeError
 
 
+async def shell(cmd):
+    return (await (await asyncio.create_subprocess_shell(cmd, stdout=PIPE)).stdout.read()).decode()
+
+
 async def adb_shell(serial, cmd, su=False, daemon=False):
     if not su:
         command = f'adb -s {serial} shell {cmd}'
@@ -79,8 +83,7 @@ async def adb_startup(serial, process):
     for p in pids_need_kill:
         await adb_shell(serial, f'kill {p}', su=True)
     await adb_shell(serial, f'/data/gdbserver :29714 --attach {pid}', su=True, daemon=True)
-    cmd = f'adb -s {serial} forward tcp:29714 tcp:29714'
-    await (await asyncio.create_subprocess_shell(cmd, stdout=PIPE)).stdout.read()
+    await shell(f'adb -s {serial} forward tcp:29714 tcp:29714')
     return '127.0.0.1:29714'
 
 
@@ -91,9 +94,11 @@ async def gdb_startup(config, println):
     assert process, 'no process selected'
     d = Device.from_string(device)
     assert d and d.scheme in ('adb',) and d.kernel in ('arm32',), 'unkown device submitted'
-    remote = None
     if d.scheme == 'adb':
         remote = await adb_startup(d.serial, process)
+
+        async def copy(src, dst):
+            await shell(f'adb -s {d.serial} pull {src} {dst}')
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
@@ -118,6 +123,7 @@ async def gdb_startup(config, println):
                 println(line)
         buffer = lines[-1]
     proc.kernel = d.kernel
+    proc.copy = copy
     if remote:
         _socket = socket.create_connection(dest_pair(remote))
 
@@ -160,6 +166,25 @@ def binary_search(a, x):
     return -(lo + 1)
 
 
+class MirrorImage:
+    @classmethod
+    async def anew(cls, path, copy):
+        self = cls()
+        self.realpath = path
+        self.fakefile = tempfile.NamedTemporaryFile()
+        self.fakepath = self.fakefile.name
+        try:
+            await copy(self.realpath, self.fakepath)
+            assert os.path.getsize(self.fakepath), 'failed to create image'
+        except BaseException:
+            self.fakefile.close()
+            raise
+        return self
+
+    async def adel(self):
+        self.fakefile.close()
+
+
 class GdbController:
     @classmethod
     async def anew(cls, config, println):
@@ -172,9 +197,12 @@ class GdbController:
         self.cmdlock = asyncio.Lock()
         self.onelock = asyncio.Lock()
         self.twolock = asyncio.Lock()
+        self.files = []
         return self
 
     async def adel(self):
+        for file in self.files:
+            await file.adel()
         if hasattr(self.process, 'atexit'):
             await self.process.atexit()
         kill_them(self.process.pid, signal.SIGINT)
@@ -194,6 +222,18 @@ class GdbController:
     def _bend(self):
         if self.process.kernel == 'arm32':
             return False
+
+    async def _get_file(self, path):
+        for file in self.files:
+            if file.realpath == path:
+                break
+        else:
+            file = await self._new_file(path)
+            self.files.append(file)
+        return file
+
+    async def _new_file(self, path):
+        return await MirrorImage.anew(path, self.process.copy)
 
     async def __command(self, command):
         async with self.cmdlock:

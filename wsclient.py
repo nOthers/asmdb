@@ -30,6 +30,30 @@ class Library:
     def size(self):
         return self._size
 
+    def find_variables(self, pattern):
+        """
+        Find all variables filter by name.
+        """
+        variables = {}
+        for symbol in self._ctrl._pull('nm', self._name):
+            if symbol['value'] is None or symbol['type'] not in ('B', 'D', 'R'):
+                continue
+            if re.search(pattern, symbol['name']):
+                variables[self._base + symbol['value']] = symbol['name']
+        return variables
+
+    def find_functions(self, pattern):
+        """
+        Find all functions filter by name.
+        """
+        functions = {}
+        for symbol in self._ctrl._pull('nm', self._name):
+            if symbol['value'] is None or symbol['type'] not in ('T',):
+                continue
+            if re.search(pattern, symbol['name']):
+                functions[self._base + symbol['value']] = symbol['name']
+        return functions
+
 
 class WsController:
     def __init__(self, url, token, daemon=True):

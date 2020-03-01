@@ -1,3 +1,4 @@
+import re
 import json
 import urllib
 import base64
@@ -6,7 +7,7 @@ import asyncio
 import tempfile
 import traceback
 import ptyprocess
-from .backend import GdbController, GdbError, binary_search
+from .backend import GdbController, GdbError, shell, binary_search
 SESSIONS = {}
 
 
@@ -205,7 +206,7 @@ class Terminal(asyncio.Protocol):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'setwinsize', 'readb', 'writeb', 'ex',)
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'nm', 'setwinsize', 'readb', 'writeb', 'ex',)
     PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps', 'lenb',)
     quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
@@ -475,3 +476,19 @@ class WsGdbController(GdbController):
         else:
             return
         notify_all(self, 'assigned', express)
+
+    async def nm(self, target):
+        symbols = []
+        file = await self._get_file(target)
+        text = await shell(f'nm -D {file.fakepath}')
+        for value, type, name, in re.findall(r'([0-9a-f ]+) (\w) (.+)', text):
+            if not value.strip():
+                value = None
+            else:
+                value = int('0x' + value, 16)
+            symbols.append({
+                'value': value,
+                'type': type,
+                'name': name,
+            })
+        return symbols
