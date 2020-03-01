@@ -1,5 +1,5 @@
 <template>
-  <div class="functions-container"></div>
+  <div class="symbols-container"></div>
 </template>
 
 <script>
@@ -9,7 +9,7 @@ export default {};
 <style lang="less">
 @import '~@/styles/theme';
 
-.functions-container {
+.symbols-container {
   height: 200px;
 }
 </style>

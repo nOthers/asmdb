@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Frame :show="nest[0].show">
-          <Functions></Functions>
+          <Symbols></Symbols>
         </Frame>
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
           <Annotation v-if="props.item.type=='annotation'" :address="props.item.address" :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Annotation>
@@ -195,7 +195,7 @@ export default {
       incomplete: 0,
       counter2: 0,
       hst: [],
-      nest: [{ show: false, label: 'functions', action: 'close', gradient: true }],
+      nest: [{ show: false, label: 'symbols', action: 'close', gradient: true }],
       label: null,
       action: null,
       gradient: true
@@ -246,7 +246,7 @@ export default {
       items.push(['Go back', '⌫', this.hst.length > 0]);
       items.push(['Search address', '↩︎', true]);
       items.push(['Return to PC', 'space', this.needReturnTo()]);
-      items.push(['Expand functions', '⌘1', !this.nest[0].show]);
+      items.push(['Expand symbols', '⌘1', !this.nest[0].show]);
       items.push(['Collapse all', '⌘0', this.first != this]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
