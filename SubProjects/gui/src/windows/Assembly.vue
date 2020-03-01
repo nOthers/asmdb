@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Frame :show="nest[0].show">
-          <Symbols @clickitem="jumpTo"></Symbols>
+          <Symbols @clickitem="onSymbolClick"></Symbols>
         </Frame>
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
           <Annotation v-if="props.item.type=='annotation'" :address="props.item.address" :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Annotation>
@@ -297,6 +297,10 @@ export default {
       for (var i = 0; i < this.nest.length; i++) {
         this.nest[i].show = i == index;
       }
+    },
+    onSymbolClick: function(address) {
+      this.jumpTo(address);
+      this.switchNest(-1);
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
