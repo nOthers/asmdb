@@ -119,7 +119,7 @@ export default {
 @import '~@/styles/theme';
 
 .symbols-container {
-  height: 200px;
+  height: 350px;
   display: flex;
   .symbols-items {
     flex-basis: 0;
