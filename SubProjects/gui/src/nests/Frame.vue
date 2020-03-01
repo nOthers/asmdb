@@ -19,11 +19,15 @@ function getChildrenHeight(el) {
 export default {
   data: function() {
     return {
-      anim: new Animation(function(v, t) {
+      anim: new Animation((v, t) => {
         var y = 1 - Math.abs(v - t);
         var x = 1 - Math.pow(1 - y, 1 / 2);
         var k = 2 - 2 * x;
-        return Math.max(k, 0.01) / 147;
+        var d = 1;
+        if (this.$el) {
+          d = getChildrenHeight(this.$el) / screen.height;
+        }
+        return Math.max(k, 0.01) / (147 + 224 * d);
       })
     };
   },
