@@ -1,0 +1,4 @@
+aiohttp
+capstone
+ptyprocess
+websocket-client
