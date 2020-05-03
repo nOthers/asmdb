@@ -8,7 +8,7 @@
     <AnimateButton class="hello-button" :style="{marginBottom:barHeight+'px'}" :text="'start debug'" @enter="startDebug"></AnimateButton>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/nOthers" target="_blank">
-      <span>power&nbsp;by&nbsp;</span>
+      <span>powered&nbsp;by&nbsp;</span>
       <span>nOthers</span>
     </a>
   </div>
