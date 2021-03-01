@@ -58,7 +58,7 @@ class Library:
 class WsController:
     def __init__(self, url, token, daemon=True):
         self._ws = websocket.create_connection(url, header={
-            'cookie': f'token={token}' + (';daemon=true' if daemon else '')
+            'cookie': f"token={token}" + (';daemon=true' if daemon else '')
         })
         self._closed = False
         self._struct = {
@@ -146,7 +146,7 @@ class WsController:
         """
         Assign register by name.
         """
-        self._pull('asgn', f'${name}={value}')
+        self._pull('asgn', f"${name}={value}")
 
     def get_bytes(self, start, length):
         """
@@ -159,7 +159,7 @@ class WsController:
         Write a range of memory.
         """
         for byte in bytes:
-            self._pull('asgn', f'*{start}={byte}')
+            self._pull('asgn', f"*{start}={byte}")
             start += 1
 
     def set_breakpoint(self, address, disable=False, comment=''):

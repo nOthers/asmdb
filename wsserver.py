@@ -480,7 +480,7 @@ class WsGdbController(GdbController):
     async def nm(self, target):
         symbols = []
         file = await self._get_file(target)
-        text = await shell(f'nm -D {file.fakepath}')
+        text = await shell(f"nm -D {file.fakepath}")
         for value, type, name, in re.findall(r'([0-9a-f ]+) (\w) (.+)', text):
             if not value.strip():
                 value = None

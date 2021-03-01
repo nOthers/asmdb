@@ -39,7 +39,7 @@ class Device:
         self.kernel = kernel
 
     def __str__(self):
-        return f'{self.scheme}://{self.serial}#{self.kernel}'
+        return f"{self.scheme}://{self.serial}#{self.kernel}"
 
 
 def dest_pair(address):
@@ -56,9 +56,9 @@ async def shell(cmd):
 
 async def adb_shell(serial, cmd, su=False, daemon=False):
     if not su:
-        command = f'adb -s {serial} shell {cmd}'
+        command = f"adb -s {serial} shell {cmd}"
     else:
-        command = f'adb -s {serial} shell "su -c \'{cmd}\'"'
+        command = f"adb -s {serial} shell 'su -c \"{cmd}\"'"
     if not daemon:
         proc = await asyncio.create_subprocess_shell(command, stdout=PIPE, stderr=PIPE)
         async for line in proc.stderr:
@@ -81,9 +81,9 @@ async def adb_startup(serial, process):
     if 'Permissive' not in (await adb_shell(serial, 'getenforce')):
         await adb_shell(serial, 'setenforce 0', su=True)
     for p in pids_need_kill:
-        await adb_shell(serial, f'kill {p}', su=True)
-    await adb_shell(serial, f'/data/gdbserver :29714 --attach {pid}', su=True, daemon=True)
-    await shell(f'adb -s {serial} forward tcp:29714 tcp:29714')
+        await adb_shell(serial, f"kill {p}", su=True)
+    await adb_shell(serial, f"/data/gdbserver :29714 --attach {pid}", su=True, daemon=True)
+    await shell(f"adb -s {serial} forward tcp:29714 tcp:29714")
     return '127.0.0.1:29714'
 
 
@@ -98,12 +98,12 @@ async def gdb_startup(config, println):
         remote = await adb_startup(d.serial, process)
 
         async def copy(src, dst):
-            await shell(f'adb -s {d.serial} pull {src} {dst}')
+            await shell(f"adb -s {d.serial} pull {src} {dst}")
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
     if remote:
-        commands.append(f'target remote {remote}')
+        commands.append(f"target remote {remote}")
     args = []
     args.append('--nx')
     args.append('-q')
@@ -372,7 +372,7 @@ class GdbController:
     async def _dump(self, start, end):
         temp = tempfile.NamedTemporaryFile()
         try:
-            text = await self._command(f'dump binary memory {temp.name} {start} {end}')
+            text = await self._command(f"dump binary memory {temp.name} {start} {end}")
             if re.search(r'Remote connection closed|Cannot access memory at address', text):
                 raise GdbError(text.strip())
             temp.seek(0)
@@ -404,21 +404,21 @@ class GdbController:
         return points
 
     async def _delete_breakpoints(self, num):
-        text = await self._command(f'delete breakpoints {num}')
+        text = await self._command(f"delete breakpoints {num}")
         if re.search(r'No breakpoint number', text):
             raise GdbError(text.strip())
 
     async def _break(self, address):
-        text = await self._command(f'break *{hex(address)}')
+        text = await self._command(f"break *{hex(address)}")
         if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
 
     async def _watch(self, address):
-        text = await self._command(f'watch *{hex(address)}')
+        text = await self._command(f"watch *{hex(address)}")
         if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
 
     async def _set(self, express):
-        text = await self._command(f'set {express}')
+        text = await self._command(f"set {express}")
         if re.search(r'Remote connection closed|Cannot access memory at address', text):
             raise GdbError(text.strip())

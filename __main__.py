@@ -28,7 +28,7 @@ async def assist_process(device):
     r = []
     d = Device.from_string(device)
     if d and d.scheme == 'adb':
-        for line in os.popen(f'adb -s {d.serial} shell ps').read().split('\n'):
+        for line in os.popen(f"adb -s {d.serial} shell ps").read().split('\n'):
             if not line.startswith('u0_a'):
                 continue
             r.append(line.split()[-1])
